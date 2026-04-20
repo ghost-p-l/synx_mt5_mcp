@@ -1,0 +1,94 @@
+# SYNX-MT5-MCP - Analyst Capability Profile
+# Full market data + account inspection + intelligence layer. No execution.
+
+profile: analyst
+description: "Full market data + account inspection + intelligence layer. No execution."
+extends: read_only
+
+allowed_tools:
+  # Connection
+  - initialize
+  - get_connection_status
+  
+  # Market Data
+  - get_symbols
+  - get_symbols_total
+  - get_symbol_info
+  - get_symbol_info_tick
+  - copy_rates_from_pos
+  - copy_rates_from
+  - copy_rates_range
+  - copy_ticks_from
+  - copy_ticks_range
+  
+  # Account & Positions
+  - account_info
+  - get_terminal_info
+  - terminal_get_info
+  - terminal_get_data_path
+  - terminal_get_common_path
+  - positions_get
+  - positions_total
+  - orders_get
+  - orders_total
+  - history_orders_get
+  - history_orders_total
+  - history_deals_get
+  - history_deals_total
+  
+  # Symbol Management
+  - symbol_select
+  
+  # Pre-trade Calculations
+  - order_calc_margin
+  - order_calc_profit
+  - order_check
+  
+  # Market Depth (DOM)
+  - market_book_subscribe
+  - market_book_get
+  - market_book_unsubscribe
+  
+  # Chart Operations (read-only)
+  - chart_list
+  - chart_indicator_list
+  
+  # Intelligence
+  - get_market_regime
+  - get_correlation_matrix
+  - get_drawdown_analysis
+  - get_strategy_context
+  - set_strategy_context
+  - get_agent_memory
+  - set_agent_memory
+  
+  # MQL5 Development (read-only)
+  - mql5_list_files
+  - mql5_read_file
+  
+  # Backtest Results (read-only)
+  - backtest_list_results
+  - backtest_get_results
+  
+  # Risk & Audit
+  - get_risk_status
+  - get_risk_limits
+  - get_trading_statistics
+  - get_audit_summary
+  - verify_audit_chain
+
+hitl_required: []
+
+rate_limits:
+  copy_rates_from_pos:
+    calls: 60
+    window_seconds: 60
+  copy_ticks_from:
+    calls: 30
+    window_seconds: 60
+  copy_rates_from:
+    calls: 60
+    window_seconds: 60
+  copy_ticks_range:
+    calls: 30
+    window_seconds: 60

@@ -1,0 +1,21 @@
+# SYNX-MT5-MCP - Aggressive Risk Profile
+# NOT RECOMMENDED for live trading
+# Use only on demo accounts for strategy testing
+
+risk:
+  require_sl: true
+  min_sl_pips: 3
+  min_rr_ratio: 0.8
+  max_risk_per_trade_pct: 2.0
+  max_total_exposure_pct: 20.0
+  max_positions_per_symbol: 5
+  max_total_positions: 20
+  
+  circuit_breaker:
+    max_session_drawdown_pct: 50.0
+    max_daily_drawdown_pct: 80.0
+    cooldown_seconds: 60
+
+hitl:
+  enabled: false  # Disabled for automated testing only
+  timeout_seconds: 60

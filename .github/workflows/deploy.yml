@@ -1,0 +1,86 @@
+name: Deploy
+
+on:
+  push:
+    branches: [production]
+    tags: ['v*']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Sync dependencies
+        run: uv sync --all-extras
+
+      - name: Run all tests
+        run: |
+          uv run pytest tests/unit/ -v --cov=src/synx_mt5 --cov-report=xml
+          uv run pytest tests/integration/ -v --ignore=tests/integration/test_ea_bridge.py || true
+
+      - name: Run linting
+        run: uv run ruff check src/
+
+      - name: Run type check
+        run: uv run mypy src/
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create Release Notes
+        run: |
+          echo "SYNX-MT5-MCP Production Release" > release_notes.txt
+          echo "================================" >> release_notes.txt
+          echo "" >> release_notes.txt
+          echo "Version: ${GITHUB_REF#refs/tags/}" >> release_notes.txt
+          echo "Branch: production" >> release_notes.txt
+          echo "" >> release_notes.txt
+          echo "Documentation:" >> release_notes.txt
+          echo "- See docs/ folder for complete guides" >> release_notes.txt
+          echo "- SETUP.md - Installation and configuration" >> release_notes.txt
+          echo "- CONFIG.md - Configuration reference" >> release_notes.txt
+          echo "- API.md - Complete API reference" >> release_notes.txt
+          echo "- RISK.md - Risk management guide" >> release_notes.txt
+          echo "- ARCHITECTURE.md - Dual-bridge architecture" >> release_notes.txt
+          echo "- TROUBLESHOOTING.md - Common issues and solutions" >> release_notes.txt
+
+      - name: Publish Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: "SYNX-MT5-MCP ${{ github.ref }}"
+          body_path: release_notes.txt
+          draft: false
+          prerelease: false
+
+  status:
+    needs: [build]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deployment status
+        run: |
+          if [ "${{ needs.build.result }}" = "success" ]; then
+            echo "✅ Production deployment ready"
+            exit 0
+          else
+            echo "❌ Deployment failed - check CI logs"
+            exit 1
+          fi

@@ -1,0 +1,74 @@
+version: "3.9"
+
+services:
+  mt5-terminal:
+    image: synx-mt5/wine:latest
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.wine
+    volumes:
+      - mt5-appdata:/root/.wine/drive_c/users/root/AppData/Roaming/MetaTrader 5
+    environment:
+      MT5_LOGIN: ${SYNX_VAULT_LOGIN:-}
+      MT5_PASSWORD: ${SYNX_VAULT_PASSWORD:-}
+      MT5_SERVER: ${SYNX_VAULT_SERVER:-}
+    ports:
+      - "18765:18765"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:18765/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  synx-mcp:
+    image: synx-mt5/server:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      mt5-terminal:
+        condition: service_healthy
+    environment:
+      SYNX_BRIDGE_MODE: ea_rest
+      SYNX_EA_HOST: mt5-terminal
+      SYNX_EA_PORT: "18765"
+      SYNX_VAULT_LOGIN: ${SYNX_VAULT_LOGIN:-}
+      SYNX_VAULT_PASSWORD: ${SYNX_VAULT_PASSWORD:-}
+      SYNX_VAULT_SERVER: ${SYNX_VAULT_SERVER:-}
+      SYNX_PROFILE: ${SYNX_PROFILE:-analyst}
+      SYNX_CONFIG: /app/synx.yaml
+    volumes:
+      - ./config/synx.example.yaml:/app/synx.yaml:ro
+      - synx-data:/app/data
+    ports:
+      - "8765:8765"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import httpx; httpx.get('http://localhost:8765/health', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  tick-streamer:
+    image: synx-mt5/server:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["tick-stream", "start"]
+    environment:
+      SYNX_BRIDGE_MODE: ea_rest
+      SYNX_EA_HOST: mt5-terminal
+      SYNX_EA_PORT: "18765"
+      SYNX_VAULT_LOGIN: ${SYNX_VAULT_LOGIN:-}
+      SYNX_VAULT_PASSWORD: ${SYNX_VAULT_PASSWORD:-}
+      SYNX_VAULT_SERVER: ${SYNX_VAULT_SERVER:-}
+      TICK_STREAMER_SYMBOLS: "EURUSD,GBPUSD,XAUUSD,USDJPY"
+      TICK_STREAMER_PORT: "8766"
+    depends_on:
+      mt5-terminal:
+        condition: service_healthy
+    ports:
+      - "8766:8766"
+
+volumes:
+  mt5-appdata:
+  synx-data:

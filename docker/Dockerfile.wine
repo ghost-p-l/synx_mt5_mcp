@@ -1,0 +1,24 @@
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y \
+    wine64 \
+    wget \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /opt/mt5 \
+    && wget -q -O /tmp/mt5setup.exe "https://download.mql5.com/cdn/web/metaquotes.softwarecorp.com/mt5/mt5setup.exe" \
+    && wine /tmp/mt5setup.exe /S \
+    && rm /tmp/mt5setup.exe
+
+ENV WINEPREFIX=/root/.wine
+ENV WINEDEBUG=-all
+
+WORKDIR /app
+COPY --from=ghcr.io/ghost-p-l/synx-mt5-mcp:latest /app /app
+
+EXPOSE 18765
+
+CMD ["wine", "console", "/root/.wine/drive_c/Program Files/MetaTrader 5/metaeditor64.exe"]

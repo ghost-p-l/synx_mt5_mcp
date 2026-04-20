@@ -1,0 +1,139 @@
+# SYNX-MT5-MCP Configuration
+# Copy this file to ~/.synx-mt5/synx.yaml and configure for your setup
+
+# ============================================
+# Server Configuration
+# ============================================
+server:
+  name: "synx-mt5-mcp"
+  version: "1.1.0"
+  log_level: "INFO"              # DEBUG | INFO | WARNING | ERROR
+  log_format: "json"             # json | text
+  storage_path: "~/.synx-mt5"    # Audit logs, agent memory, strategy context
+
+# ============================================
+# Transport Mode
+# ============================================
+# stdio (default for terminal agents like Claude Code)
+# http for HTTP/SSE transport (multi-client mode)
+transport:
+  mode: "stdio"
+  http_host: "127.0.0.1"
+  http_port: 8765
+  api_key_required: true
+
+# ============================================
+# Bridge Mode
+# ============================================
+# python_com (Windows, recommended) - Uses official MT5 Python package
+# ea_rest (Cross-platform) - Requires SYNX_EA MQL5 Service
+# wine (Linux CI) - Via Wine/Distrobox
+bridge:
+  mode: "python_com"
+  
+  python_com:
+    terminal_path: null          # Auto-detect if null
+    reconnect_interval_seconds: 30
+    max_retries: 5
+    backoff_factor: 2.0
+  
+  ea_rest:
+    host: "127.0.0.1"
+    port: 18765
+    timeout_seconds: 5
+  
+  metaeditor:
+    path: null                   # Auto-detect from terminal path if null
+    timeout_seconds: 60
+  
+  filling_mode: "ioc"            # ioc | fok | return (broker dependent)
+  slippage_points: 20
+
+# ============================================
+# Capability Profile
+# ============================================
+# read_only - Market data only
+# analyst - Data + intelligence + account inspection
+# executor - Analyst + order execution + chart control
+# full - All tools including destructive operations
+profile: "analyst"
+
+# ============================================
+# Risk Management
+# ============================================
+risk:
+  require_sl: true              # Stop loss required on live accounts
+  min_sl_pips: 5                # Minimum stop loss distance in pips
+  min_rr_ratio: 1.0             # Minimum risk:reward ratio
+  max_risk_per_trade_pct: 1.0   # Max risk per trade as % of equity
+  max_total_exposure_pct: 10.0  # Max total exposure as % of equity
+  max_positions_per_symbol: 3    # Max positions per symbol
+  max_total_positions: 10       # Max total open positions
+  
+  circuit_breaker:
+    max_session_drawdown_pct: 3.0  # Trip breaker at this drawdown
+    max_daily_drawdown_pct: 5.0   # Daily drawdown limit
+    cooldown_seconds: 3600         # Cooldown period after breaker trip
+
+# ============================================
+# Human-in-the-Loop Configuration
+# ============================================
+hitl:
+  enabled: true                  # Enable HITL approval gate
+  tools:
+    - order_send               # Tools requiring approval
+    - position_close
+    - position_close_all
+    - backtest_run
+    - backtest_optimize
+    - mql5_run_script
+  timeout_seconds: 300          # Approval timeout
+  sink: "terminal"              # terminal | webhook | telegram
+  webhook_url: null            # URL to POST approval requests to
+  webhook_secret: null         # HMAC-SHA256 secret for webhook payload signing
+
+# ============================================
+# Idempotency Engine
+# ============================================
+idempotency:
+  ttl_seconds: 300              # Time window for duplicate detection
+  max_cache_size: 10000         # Max cached order keys
+
+# ============================================
+# Security Layer
+# ============================================
+security:
+  prompt_injection_shield: true  # Always true - cannot be disabled
+  audit_log:
+    enabled: true
+    path: "~/.synx-mt5/audit.jsonl"
+    chain_verification: true    # Verify hash chain integrity
+    rotate_size_mb: 100         # Rotate log when this size reached
+
+# ============================================
+# Intelligence Layer
+# ============================================
+intelligence:
+  cache_ttl_seconds: 300        # Cache TTL for correlation/matrix
+  regime_detector:
+    adx_threshold: 25.0          # ADX threshold for trend detection
+    volatility_high: 0.005      # High volatility threshold (normalized ATR)
+    volatility_low: 0.001        # Low volatility threshold
+  correlation:
+    high_threshold: 0.75        # Warning threshold for high correlation
+
+# ============================================
+# MQL5 Development
+# ============================================
+mql5_dev:
+  metaeditor_path: null          # Auto-detect; override if non-standard
+  mql5_dir: null                # Auto-detect from terminal data_path
+  max_file_size_kb: 512         # Max source file size
+  compile_timeout_seconds: 60    # Compilation timeout
+
+# ============================================
+# Strategy Tester
+# ============================================
+strategy_tester:
+  results_dir: null             # Auto-detect from terminal data_path
+  max_concurrent_tests: 1       # MT5 tester is single-threaded

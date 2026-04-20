@@ -1,0 +1,20 @@
+# SYNX-MT5-MCP - Conservative Risk Profile
+# Maximum safety for live trading
+
+risk:
+  require_sl: true
+  min_sl_pips: 10
+  min_rr_ratio: 1.5
+  max_risk_per_trade_pct: 0.5
+  max_total_exposure_pct: 5.0
+  max_positions_per_symbol: 1
+  max_total_positions: 3
+  
+  circuit_breaker:
+    max_session_drawdown_pct: 1.5
+    max_daily_drawdown_pct: 2.0
+    cooldown_seconds: 7200
+
+hitl:
+  enabled: true
+  timeout_seconds: 600

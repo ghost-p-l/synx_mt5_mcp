@@ -1,0 +1,145 @@
+[project]
+name = "synx-mt5-mcp"
+version = "1.1.0"
+description = "SYNX - SYstem Nexus: Production-grade MT5 MCP server for AI trading agents"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "SYNX-MT5 Contributors"}
+]
+requires-python = ">=3.11"
+keywords = ["mt5", "metatrader", "mcp", "trading", "ai", "mcp-server"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Office/Business :: Financial :: Investment",
+]
+
+dependencies = [
+    'MetaTrader5>=5.0.45; sys_platform == "win32"',
+    "mcp>=1.0.0",
+    "fastmcp>=0.1.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "pyyaml>=6.0.0",
+    "keyring>=25.0.0",
+    "cryptography>=42.0.0",
+    "numpy>=1.26.0",
+    "pandas>=2.0.0",
+    "httpx>=0.27.0",
+    "websockets>=12.0.0",
+    "tenacity>=8.0.0",
+    "structlog>=24.0.0",
+    "rich>=13.0.0",
+    "typer>=0.12.0",
+    "click>=8.0.0",
+    "python-dotenv>=1.0.0",
+    "uvicorn>=0.27.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.12.0",
+    "ruff>=0.3.0",
+    "mypy>=1.9.0",
+    "pre-commit>=3.6.0",
+    "hypothesis>=6.100.0",
+]
+wine = [
+    "pywinauto>=0.6.8",
+]
+
+[project.scripts]
+synx-mt5 = "synx_mt5.cli:main"
+synx-mt5-server = "synx_mt5.server:main"
+
+[project.urls]
+Homepage = "https://github.com/ghost-p-l/synx-mt5-mcp"
+Documentation = "https://github.com/ghost-p-l/synx-mt5-mcp#readme"
+Repository = "https://github.com/ghost-p-l/synx-mt5-mcp"
+Issues = "https://github.com/ghost-p-l/synx-mt5-mcp/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/synx_mt5"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+
+[tool.coverage.run]
+source = ["src/synx_mt5"]
+branch = true
+omit = ["tests/*", "**/__pycache__/*"]
+
+[tool.coverage.report]
+fail_under = 25
+show_missing = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"src/synx_mt5/bridge/python_com.py" = ["N813"]
+"src/synx_mt5/resources/guides.py" = ["E501"]
+"src/synx_mt5/tools/intelligence.py" = ["E501"]
+"src/synx_mt5/security/injection_shield.py" = ["N818"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = false
+warn_unused_ignores = true
+ignore_missing_imports = true
+no_implicit_optional = false
+warn_redundant_casts = false
+warn_unused_configs = false
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = false
+disallow_any_generics = false
+disallow_any_expr = false
+disallow_untyped_decorators = false
+warn_no_return = true
+disallow_subclassing_any = false
+
+[[tool.mypy.overrides]]
+module = ["synx_mt5.bridge.*", "synx_mt5.tools.*", "synx_mt5.server", "synx_mt5.cli"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "src.synx_mt5.bridge.*"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "src.synx_mt5.tools.*"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "src.synx_mt5.server"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "src.synx_mt5.cli"
+ignore_errors = true
+
+[dependency-groups]
+dev = ["synx-mt5-mcp[dev]"]
+wine = ["synx-mt5-mcp[wine]"]

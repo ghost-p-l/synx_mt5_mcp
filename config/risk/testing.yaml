@@ -1,0 +1,20 @@
+# SYNX-MT5-MCP - Testing Risk Profile
+# For strategy testing only - NOT for live trading
+
+risk:
+  require_sl: false
+  min_sl_pips: 2
+  min_rr_ratio: 0.5
+  max_risk_per_trade_pct: 3.0
+  max_total_exposure_pct: 30.0
+  max_positions_per_symbol: 5
+  max_total_positions: 20
+  
+  circuit_breaker:
+    max_session_drawdown_pct: 20.0
+    max_daily_drawdown_pct: 30.0
+    cooldown_seconds: 60
+
+hitl:
+  enabled: false
+  timeout_seconds: 30

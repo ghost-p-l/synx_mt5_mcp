@@ -1,0 +1,56 @@
+# SYNX-MT5-MCP - Executor Capability Profile
+# Analyst access plus order execution within risk limits.
+
+profile: executor
+description: "Full analyst access plus order execution within risk limits."
+extends: analyst
+
+allowed_tools:
+  # All analyst tools plus:
+  
+  # Order Execution
+  - order_send
+  - order_modify
+  - order_cancel
+  
+  # Position Management
+  - position_modify
+  - position_close
+  - position_close_partial
+  
+  # Chart Operations (full)
+  - chart_open
+  - chart_close
+  - chart_screenshot
+  - chart_set_symbol_timeframe
+  - chart_apply_template
+  - chart_navigate
+  - chart_indicator_add
+  - chart_indicator_list
+  
+  # MQL5 Development (full)
+  - mql5_write_file
+  - mql5_compile
+  - mql5_run_script
+  
+  # Backtest (partial)
+  - backtest_list_results
+  - backtest_get_results
+
+hitl_required:
+  - order_send
+  - position_close
+  - mql5_run_script
+
+risk_override: false
+
+rate_limits:
+  copy_rates_from_pos:
+    calls: 60
+    window_seconds: 60
+  copy_ticks_from:
+    calls: 30
+    window_seconds: 60
+  order_send:
+    calls: 10
+    window_seconds: 60

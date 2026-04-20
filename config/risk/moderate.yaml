@@ -1,0 +1,20 @@
+# SYNX-MT5-MCP - Moderate Risk Profile
+# Balanced risk management for experienced traders
+
+risk:
+  require_sl: true
+  min_sl_pips: 5
+  min_rr_ratio: 1.0
+  max_risk_per_trade_pct: 1.0
+  max_total_exposure_pct: 10.0
+  max_positions_per_symbol: 3
+  max_total_positions: 10
+  
+  circuit_breaker:
+    max_session_drawdown_pct: 20.0
+    max_daily_drawdown_pct: 30.0
+    cooldown_seconds: 60
+
+hitl:
+  enabled: true
+  timeout_seconds: 300

@@ -1,0 +1,45 @@
+# SYNX-MT5-MCP - Read-Only Capability Profile
+# Market data only - no account data, no execution
+
+profile: read_only
+description: "Read-only access to market data. No account data. No execution."
+
+allowed_tools:
+  # Connection
+  - initialize
+  - get_connection_status
+  
+  # Market Data
+  - get_symbols
+  - get_symbol_info
+  - get_symbol_info_tick
+  - copy_rates_from_pos
+  - copy_rates_from
+  - copy_rates_range
+  - copy_ticks_from
+  - copy_ticks_range
+  - get_symbols_total
+  
+  # Intelligence (read-only)
+  - get_market_regime
+  - get_correlation_matrix
+  
+  # Audit (read-only)
+  - get_audit_summary
+  - verify_audit_chain
+
+hitl_required: []
+
+rate_limits:
+  copy_rates_from_pos:
+    calls: 60
+    window_seconds: 60
+  copy_ticks_from:
+    calls: 30
+    window_seconds: 60
+  copy_rates_from:
+    calls: 60
+    window_seconds: 60
+  copy_ticks_range:
+    calls: 30
+    window_seconds: 60

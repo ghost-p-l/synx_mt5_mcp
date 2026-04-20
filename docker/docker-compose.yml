@@ -1,0 +1,86 @@
+# SYNX-MT5-MCP Docker Setup
+
+## Wine/Distrobox Mode
+
+For Linux environments, SYNX-MT5-MCP can run via Wine with the MT5 terminal.
+
+### Prerequisites
+
+- Docker & Docker Compose
+- Wine or Distrobox (for full terminal functionality)
+
+### Quick Start
+
+```bash
+# Clone repository
+git clone https://github.com/ghost-p-l/synx-mt5-mcp.git
+cd synx-mt5-mcp
+
+# Build and run
+docker-compose up -d
+
+# View logs
+docker-compose logs -f synx-mcp
+```
+
+### Environment Variables
+
+```bash
+# MT5 Credentials
+SYNX_VAULT_LOGIN=your_account_number
+SYNX_VAULT_PASSWORD=your_password
+SYNX_VAULT_SERVER=broker-server
+
+# Profile (read_only, analyst, executor, full)
+SYNX_PROFILE=analyst
+
+# Bridge Mode
+SYNX_BRIDGE_MODE=ea_rest
+```
+
+## Docker Compose Configuration
+
+```yaml
+version: "3.9"
+services:
+  mt5-terminal:
+    image: synx-mt5/wine:latest
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.wine
+    volumes:
+      - mt5-appdata:/root/.wine/drive_c/users/root/AppData/Roaming/MetaTrader 5
+    environment:
+      MT5_LOGIN: ${SYNX_VAULT_LOGIN}
+      MT5_PASSWORD: ${SYNX_VAULT_PASSWORD}
+      MT5_SERVER: ${SYNX_VAULT_SERVER}
+    ports:
+      - "18765:18765"  # SYNX_EA REST API
+
+  synx-mcp:
+    image: synx-mt5/server:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - mt5-terminal
+    environment:
+      SYNX_BRIDGE_MODE: ea_rest
+      SYNX_EA_HOST: mt5-terminal
+      SYNX_EA_PORT: 18765
+      SYNX_VAULT_LOGIN: ${SYNX_VAULT_LOGIN}
+      SYNX_VAULT_PASSWORD: ${SYNX_VAULT_PASSWORD}
+      SYNX_VAULT_SERVER: ${SYNX_VAULT_SERVER}
+      SYNX_PROFILE: ${SYNX_PROFILE:-analyst}
+    ports:
+      - "8765:8765"  # MCP server
+
+volumes:
+  mt5-appdata:
+```
+
+## Limitations
+
+- Wine mode has performance overhead
+- Not recommended for production
+- Use Windows native mode when possible

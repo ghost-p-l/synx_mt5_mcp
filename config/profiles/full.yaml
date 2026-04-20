@@ -1,0 +1,46 @@
+# SYNX-MT5-MCP - Full Capability Profile
+# All tools enabled. For advanced users only.
+
+profile: full
+description: "All tools enabled. For advanced users. HITL strongly recommended."
+extends: executor
+
+allowed_tools:
+  # All executor tools plus:
+  
+  # Destructive Operations
+  - position_close_all
+  - shutdown
+  
+  # Chart Templates (full save)
+  - chart_save_template
+  
+  # Strategy Tester (full)
+  - backtest_run
+  - backtest_optimize
+  - backtest_list_results
+  - backtest_get_results
+
+hitl_required:
+  - order_send
+  - position_close
+  - position_close_all
+  - backtest_run
+  - backtest_optimize
+  - mql5_run_script
+
+risk_override: false  # Cannot override risk limits even in full mode
+
+rate_limits:
+  copy_rates_from_pos:
+    calls: 60
+    window_seconds: 60
+  copy_ticks_from:
+    calls: 30
+    window_seconds: 60
+  order_send:
+    calls: 10
+    window_seconds: 60
+  backtest_run:
+    calls: 5
+    window_seconds: 3600
