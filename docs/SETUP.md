@@ -58,10 +58,19 @@ See [Configuration Reference](CONFIG.md) for detailed options.
 Credentials are stored securely in the OS keyring vault:
 
 ```bash
-# Store MT5 account credentials
-python -m synx_mt5.security.vault set-credential mt5_login <your-login>
-python -m synx_mt5.security.vault set-credential mt5_password <your-password>
+# Store MT5 account credentials.
+# Omit the value to be prompted securely (recommended — keeps secrets
+# out of shell history). The server name is not secret, so inline is fine.
+python -m synx_mt5.security.vault set-credential mt5_login
+python -m synx_mt5.security.vault set-credential mt5_password
 python -m synx_mt5.security.vault set-credential mt5_server <broker-server>
+
+# ...or set all three at once with the interactive wizard
+# (identical to `synx-mt5 setup`):
+python -m synx_mt5.security.vault wizard
+
+# Verify what's stored (values are never printed):
+python -m synx_mt5.security.vault status
 ```
 
 #### Option B: Environment Variables (Development Only)
@@ -398,7 +407,7 @@ pytest tests/ -v
 **Error:** `Authentication failed: Invalid credentials`
 
 **Solution:**
-1. Store credentials in OS keyring vault (recommended)
+1. Store credentials in OS keyring vault (recommended): run `python -m synx_mt5.security.vault wizard` (or `synx-mt5 setup`), then confirm with `python -m synx_mt5.security.vault status`
 2. Or set environment variables (development only)
 3. Never put credentials in config files
 

@@ -271,6 +271,7 @@ synx_mt5_mcp/
 │       ├── security/
 │       │   ├── __init__.py
 │       │   ├── secrets.py               # OS keyring vault integration
+│       │   ├── vault.py                 # Non-interactive vault CLI (set/get/delete/status/wizard)
 │       │   ├── injection_shield.py      # Prompt injection sanitiser
 │       │   ├── tool_validator.py        # Tool metadata integrity checks
 │       │   ├── capability.py            # Capability profile enforcer
